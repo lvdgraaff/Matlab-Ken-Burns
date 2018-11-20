@@ -12,7 +12,6 @@ classdef KenburnsObj < handle
         Image
         
         duration = 3
-        fps = 30;
         frameSize = [240 320]; % [height width]
         
         % method should be either 'crop' or 'translate'
@@ -126,7 +125,7 @@ classdef KenburnsObj < handle
     methods(Access=private)
         
         function [cropRect, baseScale] = createCrops(this)
-            nFrames = this.duration * this.fps;
+            nFrames = this.duration * this.videoWriter.FrameRate;
             t = this.translation(linspace(0,1,nFrames));
             cropRect = this.startRect(:)' + t(:) .* (this.endRect(:)' - this.startRect(:)');
             
@@ -139,7 +138,6 @@ classdef KenburnsObj < handle
                 'KenBurnsObj.method should either be ''crop'' or ''translate''');
             validateattributes(this.translation, {'function_handle'}, {}, 'KenBurnsObj', 'translation');
             validateattributes(this.duration, {'numeric'}, {'scalar'}, 'KenBurnsObj', 'duration');
-            validateattributes(this.fps, {'numeric'}, {'scalar'}, 'KenBurnsObj', 'fps');
             validateattributes(this.frameSize, {'numeric'}, {'integer', 'positive', 'numel', 2}, 'KenBurnsObj', 'frameSize');
             
             validateattributes(this.startRect, {'numeric'}, {'numel', 3}, 'KenBurnsObj', 'startRect');            
