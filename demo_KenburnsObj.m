@@ -48,8 +48,9 @@ KenBurns.plot();
 KenBurns.make();
 
 %% For small images
-% For small images it can be advantageous to upsample the image before 
-% before creating the KenBurnsObj. This prevents aliasing of the image.
+% For small images it can be advantageous to upsample the image before creating the KenBurnsObj. 
+% This prevents aliasing in the movie.
+
 Image = imread('cameraman.tif');
 Image = imresize(Image, 2);
 videoWriter = VideoWriter('kenburns_upsampled','MPEG-4');
@@ -73,6 +74,4 @@ KenBurns.plot();
 
 % write
 KenBurns.make();
-
-
 
