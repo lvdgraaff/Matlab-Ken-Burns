@@ -89,6 +89,14 @@ classdef KenburnsObj < handle
             fprintf('\ndone.\n');
         end
         
+        function h = image(this, hAxis)
+            if nargin < 2 || isempty(hAxis)
+                hAxis = gca;
+            end
+            
+            h = imshow(this.Image, 'Parent', hAxis);
+        end
+            
         function h = plot(this, hAxis)
             this.validate();
             
