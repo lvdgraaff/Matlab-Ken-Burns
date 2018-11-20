@@ -34,7 +34,7 @@ classdef KenburnsObj < handle
     end
     
     properties(Constant)
-        plotNFrames = 7;
+        plotNFrames = 25;
     end
     
     methods
@@ -112,8 +112,13 @@ classdef KenburnsObj < handle
             hAxis.XLim = [1 size(this.Image,1)];
             hAxis.YLim = [1 size(this.Image,2)];
             title(hAxis, this.videoWriter.Filename, 'Interpreter', 'none');
- 
-            frames = round(linspace(1, size(cropRect,1), this.plotNFrames));
+            
+            if this.plotNFrames < size(cropRect,1)
+                frames = round(linspace(1, size(cropRect,1), this.plotNFrames));
+            else
+                frames = 1:size(cropRect,1);
+            end
+                
             h = gobjects(size(frames));
             
             for i = 1:numel(frames)
@@ -124,9 +129,10 @@ classdef KenburnsObj < handle
                 y = xy(2) + [0 1 1 0 0] * wh(2);
                 h(i) = plot(hAxis, x,y);
                 h(i).DisplayName = sprintf('Frame %d', k);
+                h(i).Color = interp1(linspace(0,1,size(hAxis.Parent.Colormap,1)), hAxis.Parent.Colormap, (frames(i)-frames(1))/frames(end));
             end
             
-            legend -DynamicLegend Location NorthEastOutside
+            legend(h([1 end]), 'Start', 'End', 'Location', 'NorthEastOutside');
         end
     end
     
