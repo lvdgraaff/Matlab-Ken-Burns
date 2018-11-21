@@ -40,7 +40,8 @@ classdef KenburnsObj < handle
     methods
         function this = KenburnsObj(videoWriter, Image)
             validateattributes(videoWriter, {'VideoWriter'}, {'scalar'});
-            validateattributes(Image, {'numeric'}, {'2d'});
+            validateattributes(Image, {'numeric'}, {});
+            assert(size(Image,3)==1 || size(Image,3)==3, 'size(Image,3) must either be 1 or 3');
             
             this.videoWriter = videoWriter;
             this.Image = Image;
@@ -79,7 +80,7 @@ classdef KenburnsObj < handle
                         % interpolated resize
                         C = imresize(C, 1/cropRect(k,3) * baseScale);
                         % now we can do a 'hard' crop
-                        Frame = C(1:this.frameSize(1),1:this.frameSize(2));
+                        Frame = C(1:this.frameSize(1),1:this.frameSize(2), :);
                 end
                 
                 writeVideo(this.videoWriter,Frame);
