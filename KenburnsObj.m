@@ -47,7 +47,7 @@ classdef KenburnsObj < handle
             this.Image = Image;
             
             this.startRect = [1 1 1];
-            this.endRect = [.2*round(flip(size(Image))), .5];
+            this.endRect = [.2*round(flip([size(Image,1) size(Image,2)])), .5];
             
             this.translation = this.translationSin;
         end
