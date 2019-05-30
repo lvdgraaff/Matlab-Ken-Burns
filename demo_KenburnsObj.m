@@ -46,32 +46,3 @@ KenBurns.plot();
 
 % write
 KenBurns.make();
-
-%% For small images
-% For small images it can be advantageous to upsample the image before creating the KenBurnsObj. 
-% This prevents aliasing in the movie.
-
-Image = imread('cameraman.tif');
-Image = imresize(Image, 2);
-videoWriter = VideoWriter('kenburns_upsampled','MPEG-4');
-KenBurns = KenburnsObj(videoWriter, Image);
-
-KenBurns.make();
-
-%% For very large images
-% For very large images the default 'translation' method is computationally expensive 
-% this can be reduced at the expense of some 'shaking' at high zoom levels
-% by setting KenBurns.method = 'crop';
-Image = imread('cameraman.tif');
-videoWriter = VideoWriter('kenburns_crop','MPEG-4');
-KenBurns = KenburnsObj(videoWriter, Image);
-KenBurns.method = 'crop';
-
-% demo
-% don't show the Image, just the crops
-clf;
-KenBurns.plot();
-
-% write
-KenBurns.make();
-

@@ -14,8 +14,9 @@ classdef KenburnsObj < handle
         duration = 3
         frameSize = [240 320]; % [height width]
         
-        % method should be either 'crop' or 'translate'
-        method = 'translate'
+        % method should be 'griddedInterpolant'
+        % depreciated: methods: 'crop' or 'translate'
+        method = 'griddedInterpolant'
         
         % startRect & endRect should have the format
         % [x, y, scale] where x, y are in Canvas space
@@ -60,6 +61,17 @@ classdef KenburnsObj < handle
             [cropRect, baseScale] = createCrops(this);
                  
             fprintf('Making %s...\nTotal frames: %d\n', this.videoWriter.Filename, size(cropRect,1));
+            
+            
+            if strcmp(this.method, 'griddedInterpolant')
+                if ~isa(this.Image, 'double')
+                    fprintf('Converting image to single precision... ');
+                    this.Image = im2single(this.Image);
+                    fprintf('done.\n');
+                end
+                Interpolant = griddedInterpolant(this.Image);
+            end
+            
             fprintf('Creating frame ');
             
             for k = 1:size(cropRect,1)
@@ -81,6 +93,12 @@ classdef KenburnsObj < handle
                         C = imresize(C, 1/cropRect(k,3) * baseScale);
                         % now we can do a 'hard' crop
                         Frame = C(1:this.frameSize(1),1:this.frameSize(2), :);
+                    case 'griddedInterpolant'
+                        xy = cropRect(k,[1 2]);
+                        wh = flip(this.frameSize)/baseScale*cropRect(k,3);
+                        x = linspace(xy(1), xy(1)-1+wh(1), this.frameSize(2));
+                        y = linspace(xy(2), xy(2)-1+wh(2), this.frameSize(1));
+                        Frame = Interpolant({y,x});
                 end
                 
                 writeVideo(this.videoWriter,Frame);
@@ -149,8 +167,14 @@ classdef KenburnsObj < handle
         end
         
         function validate(this)
-            assert(strcmp(this.method, 'crop') || strcmp(this.method, 'translate'), ...
-                'KenBurnsObj.method should either be ''crop'' or ''translate''');
+            assert(strcmp(this.method, 'crop') || strcmp(this.method, 'translate') || strcmp(this.method, 'griddedInterpolant'), ...
+                'KenBurnsObj.method should be ''crop'' or ''translate'' or ''griddedInterpolant''');
+            if strcmp(this.method, 'crop')
+                warning('Crop is depreciated. Use griddedInterpolant.')
+            end
+            if strcmp(this.method, 'translate')
+                warning('Translate is depreciated. Use griddedInterpolant.')
+            end
             validateattributes(this.translation, {'function_handle'}, {}, 'KenBurnsObj', 'translation');
             validateattributes(this.duration, {'numeric'}, {'scalar'}, 'KenBurnsObj', 'duration');
             validateattributes(this.frameSize, {'numeric'}, {'integer', 'positive', 'numel', 2}, 'KenBurnsObj', 'frameSize');
