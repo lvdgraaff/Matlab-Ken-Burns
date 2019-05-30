@@ -77,7 +77,7 @@ classdef KenburnsObj < handle
             
             for k = 1:size(cropRect,1)
             
-                fprintf('%d ', k);
+                fprintf(' %d', k);
                 
                 switch(this.method)
                     case 'crop'
@@ -102,13 +102,12 @@ classdef KenburnsObj < handle
                         
                         % griddedInterpolant does not provide low pass
                         % filtering, only aliasing. So we do it ourselves
-                        dx = diff(x(1:2));
-                        dy = diff(x(1:2));
-                        d = max(dx, dy);
+                        d = max(diff(x(1:2)), diff(y(1:2)));
                         if this.antialias && d > 1
                             % @todo: we might want to use a filter that has
                             % a shaper cutoff and/or is more efficient.
                             Interpolant = griddedInterpolant(imgaussfilt(this.Image, d*this.filterKernelSize));
+                            fprintf('*', k);
                         else
                             Interpolant = griddedInterpolant(this.Image);
                         end
