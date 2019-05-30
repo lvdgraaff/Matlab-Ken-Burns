@@ -107,7 +107,7 @@ classdef KenburnsObj < handle
                             % @todo: we might want to use a filter that has
                             % a shaper cutoff and/or is more efficient.
                             Interpolant = griddedInterpolant(imgaussfilt(this.Image, d*this.filterKernelSize));
-                            fprintf('*', k);
+                            %fprintf('*');
                         else
                             Interpolant = griddedInterpolant(this.Image);
                         end
