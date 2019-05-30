@@ -14,6 +14,19 @@ KenBurns.plot();
 % write
 KenBurns.make();
 
+%% Color image
+Image = imread('autumn.tif');
+videoWriter = VideoWriter('kenburns_color','MPEG-4');
+KenBurns = KenburnsObj(videoWriter, Image);
+
+% Demo
+clf;
+KenBurns.image();
+KenBurns.plot();
+
+% write
+KenBurns.make();
+
 %% Demonstration of options
 Image = imread('cameraman.tif');
 videoWriter = VideoWriter('kenburns_options','MPEG-4');

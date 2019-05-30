@@ -98,7 +98,7 @@ classdef KenburnsObj < handle
                         wh = flip(this.frameSize)/baseScale*cropRect(k,3);
                         x = linspace(xy(1), xy(1)-1+wh(1), this.frameSize(2));
                         y = linspace(xy(2), xy(2)-1+wh(2), this.frameSize(1));
-                        Frame = Interpolant({y,x});
+                        Frame = Interpolant({y,x,1:size(this.Image,3)});
                 end
                 
                 writeVideo(this.videoWriter,Frame);
