@@ -17,6 +17,8 @@ classdef KenburnsObj < handle
         % method should be 'griddedInterpolant'
         % depreciated: methods: 'crop' or 'translate'
         method = 'griddedInterpolant'
+        antialias = true
+        filterKernelSize = 0.5 % scalar setting 1: hardly any aliasing, 0.5: some aliasing but crisp contast. >>1: blurry images
         
         % startRect & endRect should have the format
         % [x, y, scale] where x, y are in Canvas space
@@ -69,7 +71,6 @@ classdef KenburnsObj < handle
                     this.Image = im2single(this.Image);
                     fprintf('done.\n');
                 end
-                Interpolant = griddedInterpolant(this.Image);
             end
             
             fprintf('Creating frame ');
@@ -98,7 +99,25 @@ classdef KenburnsObj < handle
                         wh = flip(this.frameSize)/baseScale*cropRect(k,3);
                         x = linspace(xy(1), xy(1)-1+wh(1), this.frameSize(2));
                         y = linspace(xy(2), xy(2)-1+wh(2), this.frameSize(1));
-                        Frame = Interpolant({y,x,1:size(this.Image,3)});
+                        
+                        % griddedInterpolant does not provide low pass
+                        % filtering, only aliasing. So we do it ourselves
+                        dx = diff(x(1:2));
+                        dy = diff(x(1:2));
+                        d = max(dx, dy);
+                        if this.antialias && d > 1
+                            % @todo: we might want to use a filter that has
+                            % a shaper cutoff and/or is more efficient.
+                            Interpolant = griddedInterpolant(imgaussfilt(this.Image, d*this.filterKernelSize));
+                        else
+                            Interpolant = griddedInterpolant(this.Image);
+                        end
+                        
+                        if size(this.Image,3)>1
+                            Frame = Interpolant({y,x,1:size(this.Image,3)});
+                        else
+                            Frame = Interpolant({y,x});
+                        end
                 end
                 
                 writeVideo(this.videoWriter,Frame);
