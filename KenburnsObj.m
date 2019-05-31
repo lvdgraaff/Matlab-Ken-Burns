@@ -17,7 +17,8 @@ classdef KenburnsObj < handle
         % method should be 'griddedInterpolant'
         % depreciated: methods: 'crop' or 'translate'
         method = 'griddedInterpolant'
-        antialias = true
+        
+        antialias = false % this method is experimental and sould be off by default
         filterKernelSize = 0.5 % scalar setting 1: hardly any aliasing, 0.5: some aliasing but crisp contast. >>1: blurry images
         
         % startRect & endRect should have the format
@@ -65,12 +66,14 @@ classdef KenburnsObj < handle
             fprintf('Making %s...\nTotal frames: %d\n', this.videoWriter.Filename, size(cropRect,1));
             
             
-            if strcmp(this.method, 'griddedInterpolant')
-                if ~isa(this.Image, 'double')
-                    fprintf('Converting image to single precision... ');
-                    this.Image = im2single(this.Image);
-                    fprintf('done.\n');
-                end
+            if strcmp(this.method, 'griddedInterpolant') && ~isa(this.Image, 'double')
+                fprintf('Converting image to single precision... ');
+                this.Image = im2single(this.Image);
+                fprintf('done.\n');
+            end
+               
+            if ~this.antialias 
+                Interpolant = griddedInterpolant(this.Image);
             end
             
             fprintf('Creating frame ');
@@ -100,16 +103,18 @@ classdef KenburnsObj < handle
                         x = linspace(xy(1), xy(1)-1+wh(1), this.frameSize(2));
                         y = linspace(xy(2), xy(2)-1+wh(2), this.frameSize(1));
                         
-                        % griddedInterpolant does not provide low pass
-                        % filtering, only aliasing. So we do it ourselves
-                        d = max(diff(x(1:2)), diff(y(1:2)));
-                        if this.antialias && d > 1
-                            % @todo: we might want to use a filter that has
-                            % a shaper cutoff and/or is more efficient.
-                            Interpolant = griddedInterpolant(imgaussfilt(this.Image, d*this.filterKernelSize));
-                            %fprintf('*');
-                        else
-                            Interpolant = griddedInterpolant(this.Image);
+                        if this.antialias 
+                            % griddedInterpolant does not provide low pass
+                            % filtering, only aliasing. So we do it ourselves
+                            d = max(diff(x(1:2)), diff(y(1:2)));
+                            if d > 1
+                                % @todo: we might want to use a filter that has
+                                % a shaper cutoff and/or is more efficient.
+                                Interpolant = griddedInterpolant(imgaussfilt(this.Image, d*this.filterKernelSize));
+                                % fprintf('*');
+                            else
+                                Interpolant = griddedInterpolant(this.Image);
+                            end
                         end
                         
                         if size(this.Image,3)>1
