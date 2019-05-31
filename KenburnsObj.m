@@ -146,8 +146,8 @@ classdef KenburnsObj < handle
             axis(hAxis, 'image');
             hold(hAxis, 'on');
             hAxis.YDir = 'reverse';
-            hAxis.XLim = [1 size(this.Image,1)];
-            hAxis.YLim = [1 size(this.Image,2)];
+            hAxis.XLim = [1 size(this.Image,2)];
+            hAxis.YLim = [1 size(this.Image,1)];
             title(hAxis, this.videoWriter.Filename, 'Interpreter', 'none');
             
             if this.plotNFrames < size(cropRect,1)
